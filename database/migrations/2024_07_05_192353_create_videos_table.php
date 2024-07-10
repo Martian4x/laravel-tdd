@@ -9,11 +9,10 @@ return new class extends Migration {
     {
         Schema::create('videos', function (Blueprint $table) {
             $table->id();
-//            $table->unsignedBigInteger('course_id');
             $table->foreignIdFor(\App\Models\Course::class);
             $table->string('slug');
             $table->string('title');
-            $table->string('video_id');
+            $table->string('vimeo_id');
             $table->text('description');
             $table->integer('duration_mn');
 

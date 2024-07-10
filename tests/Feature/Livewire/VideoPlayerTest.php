@@ -13,7 +13,9 @@ function createCourseVideo(int $videosCount=1): Course
 it('shows details for given video', function () {
     //Arrange
     $course = createCourseVideo();
+//    dd($course);
     // Act & Assert
+    loginAsUser();
     $video = $course->videos->first();
     Livewire::test(VideoPlayer::class, ['video'=>$video])
         ->assertSeeText([
@@ -28,9 +30,10 @@ it('show given video', function () {
     $course = createCourseVideo();
 
     // Act & Assert
+    loginAsUser();
     $video = $course->videos->first();
     Livewire::test(VideoPlayer::class, ['video'=>$video])
-        ->assertSeeHtml('<iframe src="https://player.vimeo.com/video/'.$video->video_id.'"');
+        ->assertSeeHtml('<iframe src="https://player.vimeo.com/video/'.$video->vimeo_id.'"');
 });
 
 it('shows list of all course videos', function () {
@@ -38,6 +41,7 @@ it('shows list of all course videos', function () {
     $course = createCourseVideo(3);
 
     // Act & Assert
+    loginAsUser();
     Livewire::test(VideoPlayer::class, ['video'=>$course->videos->first()])
         ->assertSee([
             ...$course->videos->pluck('titles')->toArray() //... is a spread operator
@@ -52,6 +56,7 @@ it('does not include route for current video', function () {
     $course = createCourseVideo();
 
     // Act & Assert
+    loginAsUser();
     Livewire::test(VideoPlayer::class, ['video'=>$course->videos->first()])
         ->assertSee([
             ...$course->videos->pluck('titles')->toArray() //... is a spread operator
@@ -72,7 +77,10 @@ it('marks video as completed', function () {
     // Act & Assert
     loginAsUser($user);
     Livewire::test(VideoPlayer::class, ['video'=>$course->videos()->first()])
-            ->call('markVideoAsCompleted');
+            ->assertMethodWired('markVideoAsCompleted')
+            ->call('markVideoAsCompleted')
+            ->assertMethodNotWired('markVideoAsCompleted')
+            ->assertMethodWired('markVideoAsNotCompleted');
 
     //Assert
     $user->refresh(); // So it refer to the previous declared user
@@ -84,6 +92,7 @@ it('marks video as not completed', function (){
     // Arrange
     $user = User::factory()->create();
     $course = createCourseVideo();
+    $course = createCourseVideo();
 
     $user->courses()->attach($course);
     $user->videos()->attach($course->videos()->first());
@@ -94,7 +103,10 @@ it('marks video as not completed', function (){
     // Act & Assert
     loginAsUser($user);
     Livewire::test(VideoPlayer::class, ['video'=>$course->videos()->first()])
-        ->call('markVideoAsNotCompleted');
+        ->assertMethodWired('markVideoAsNotCompleted')
+        ->call('markVideoAsNotCompleted')
+        ->assertMethodNotWired('markVideoAsNotCompleted')
+        ->assertMethodWired('markVideoAsCompleted');
 
     //Assert
     $user->refresh(); // So it refer to the previous declared user

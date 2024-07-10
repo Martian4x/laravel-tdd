@@ -16,7 +16,7 @@ class VideoFactory extends Factory
         return [
             'course_id' => Course::factory(),
             'slug' => $this->faker->slug,
-            'video_id'=>$this->faker->uuid,
+            'vimeo_id'=>$this->faker->uuid,
             'title' => $this->faker->title,
             'description'=>$this->faker->paragraph,
             'duration_mn' => $this->faker->numberBetween(1, 99),
