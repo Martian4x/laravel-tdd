@@ -65,6 +65,7 @@ class User extends Authenticatable
         ];
     }
 
+    // Purchased Courses
     public function courses(): BelongsToMany
     {
         return $this->belongsToMany(Course::class,'purchased_courses')
@@ -72,6 +73,7 @@ class User extends Authenticatable
             ->orderByDesc('pivot_created_at');
     }
 
+    // Watched Courses
     public function videos(): BelongsToMany
     {
         return $this->belongsToMany(Video::class, 'watched_videos')
