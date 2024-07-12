@@ -10,12 +10,17 @@ function createCourseVideo(int $videosCount=1): Course
     return Course::factory()->has(Video::factory()->count($videosCount))->create();
 }
 
+// Instead of log in user in every test, do it once here and attach it to loggedInUser property as it will be ready available to all functions
+beforeEach(function (){
+    $this->loggedInUser = loginAsUser();
+});
+
 it('shows details for given video', function () {
     //Arrange
     $course = createCourseVideo();
 //    dd($course);
     // Act & Assert
-    loginAsUser();
+//    loginAsUser();
     $video = $course->videos->first();
     Livewire::test(VideoPlayer::class, ['video'=>$video])
         ->assertSeeText([
@@ -30,7 +35,7 @@ it('show given video', function () {
     $course = createCourseVideo();
 
     // Act & Assert
-    loginAsUser();
+//    loginAsUser();
     $video = $course->videos->first();
     Livewire::test(VideoPlayer::class, ['video'=>$video])
         ->assertSeeHtml('<iframe src="https://player.vimeo.com/video/'.$video->vimeo_id.'"');
@@ -41,7 +46,7 @@ it('shows list of all course videos', function () {
     $course = createCourseVideo(3);
 
     // Act & Assert
-    loginAsUser();
+//    loginAsUser();
     Livewire::test(VideoPlayer::class, ['video'=>$course->videos->first()])
         ->assertSee([
             ...$course->videos->pluck('titles')->toArray() //... is a spread operator
@@ -56,7 +61,7 @@ it('does not include route for current video', function () {
     $course = createCourseVideo();
 
     // Act & Assert
-    loginAsUser();
+//    loginAsUser();
     Livewire::test(VideoPlayer::class, ['video'=>$course->videos->first()])
         ->assertSee([
             ...$course->videos->pluck('titles')->toArray() //... is a spread operator
@@ -66,16 +71,16 @@ it('does not include route for current video', function () {
 
 it('marks video as completed', function () {
     // Arrange
-    $user = User::factory()->create();
+//    $user = User::factory()->create();
     $course = createCourseVideo();
 
-    $user->courses()->attach($course);
+    $this->loggedInUser->courses()->attach($course);
 
     // Assert
-    expect($user->videos)->toHaveCount(0);
+    expect($this->loggedInUser->videos)->toHaveCount(0);
 
     // Act & Assert
-    loginAsUser($user);
+    loginAsUser($this->loggedInUser);
     Livewire::test(VideoPlayer::class, ['video'=>$course->videos()->first()])
             ->assertMethodWired('markVideoAsCompleted')
             ->call('markVideoAsCompleted')
@@ -83,25 +88,25 @@ it('marks video as completed', function () {
             ->assertMethodWired('markVideoAsNotCompleted');
 
     //Assert
-    $user->refresh(); // So it refer to the previous declared user
-    expect($user->videos)->toHaveCount(1)
+    $this->loggedInUser->refresh(); // So it refer to the previous declared user
+    expect($this->loggedInUser->videos)->toHaveCount(1)
         ->first()->title->toEqual($course->videos->first()->title);
 });
 
 it('marks video as not completed', function (){
     // Arrange
-    $user = User::factory()->create();
+//    $user = User::factory()->create();
     $course = createCourseVideo();
     $course = createCourseVideo();
 
-    $user->courses()->attach($course);
-    $user->videos()->attach($course->videos()->first());
+    $this->loggedInUser->courses()->attach($course);
+    $this->loggedInUser->videos()->attach($course->videos()->first());
 
     // Assert
-    expect($user->videos)->toHaveCount(1);
+    expect($this->loggedInUser->videos)->toHaveCount(1);
 
     // Act & Assert
-    loginAsUser($user);
+    loginAsUser($this->loggedInUser);
     Livewire::test(VideoPlayer::class, ['video'=>$course->videos()->first()])
         ->assertMethodWired('markVideoAsNotCompleted')
         ->call('markVideoAsNotCompleted')
@@ -109,7 +114,7 @@ it('marks video as not completed', function (){
         ->assertMethodWired('markVideoAsCompleted');
 
     //Assert
-    $user->refresh(); // So it refer to the previous declared user
-    expect($user->videos)->toHaveCount(0);
+    $this->loggedInUser->refresh(); // So it refer to the previous declared user
+    expect($this->loggedInUser->videos)->toHaveCount(0);
 });
 
