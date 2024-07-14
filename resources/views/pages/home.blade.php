@@ -12,10 +12,10 @@
         <button type="submit">Log Out</button>
     </form>
 @endguest
-<a href="{{ route('login') }}">Login</a>
+
     @foreach($courses as $course)
         <h3>{{ $course->title }}</h3>
-        <h3>{{ $course->description }}</h3>
+        <p>{{ $course->description }}</p>
     @endforeach
 
 

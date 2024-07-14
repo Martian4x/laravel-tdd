@@ -46,13 +46,13 @@ it('shows list of all course videos', function () {
     $course = createCourseVideo(3);
 
     // Act & Assert
-//    loginAsUser();
+    // loginAsUser();
     Livewire::test(VideoPlayer::class, ['video'=>$course->videos->first()])
         ->assertSee([
             ...$course->videos->pluck('titles')->toArray() //... is a spread operator
         ])->assertSeeHtml([
-            route('pages.course-videos', $course->videos[1]),
-            route('pages.course-videos', $course->videos[2]),
+            route('pages.course-videos', [$course, $course->videos[1]]),
+            route('pages.course-videos', ['course'=>$course, 'video'=> $course->videos[2]]),
         ]);
 });
 

@@ -78,7 +78,8 @@ test('adds local test use', function () {
 test('does not add test user for production', function () {
     App::partialMock()->shouldReceive('environment')->andReturn('production');
     // Assert
-    $this->assertDatabaseCount(User::class,0);
+//    $this->assertDatabaseCount(User::class,0);
+    $this->assertDatabaseEmpty(User::class);
 
     // Act
     $this->artisan('db:seed');
